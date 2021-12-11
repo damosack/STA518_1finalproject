@@ -5,15 +5,20 @@ date: "12/8/2021"
 output: pdf_document
 ---
 
-## Final Project Link
+### Shiny App and GitHub Repository Links
 https://damosack.shinyapps.io/BechdelMovies/?_ga=2.142585394.1024157967.1639000711-2034314723.1639000711
-## GitHub Repository Link
+
+https://github.com/damosack/STA518_1finalproject
+
+# Course progress
+
+When I began this semester, I had already taken several classes that necessitated using R a lot. Biostatistics, computational biology, and regressional analysis (GVSU) spring to mind. While we did a lot of work in R, and I think that learning R was one of the main objectives, it was so incidental that I got out of these courses knowing how to say a few phrases but not how to make my own, if you'll excuse a bad analogy. Basically, it was a lot of copy and paste, and while I knew how to do some pretty specific high level stuff, no awareness of basics was crippling when trying to write something from scratch. My point, though, is that by the time I started this course I really didn't know how to do anything in R, and I had no idea where to start learning. 
+
+Looking back on the past semester, I'm confident I've never learned so much coding language (if you would consider R to have its own language) in such a short amount of time. While I may be better at doing statistical analysis in SAS, I'm certain I know how to work in R with much greater ease, particularly when it comes to data manipulation. There are still things we covered which I'm a bit shaky on, such as for-loops and the creation of elaborate shiny apps (shaky is perhaps an understatement with that one), but I think that overall the amount of effort I put into the course each week was richly rewarded, and when other commitments forced me to focus my attention elsewhere, my understanding of a given week's topic suffered noticeably. Regardless, to the best of my creativity, I always tried to experiment with new code we learned, and incorporate it into other work as much as possible. To be honest, experimentation with web scraping and, later, APIs motivated my topic for the final project perhaps more than anything. Ultimately, the code I wrote for that project was neither lengthy nor extremely complex, but it was the product of more than a few late nights and many, many mistakes in R's console. Even if it is far from the most impressive project, and even though I needed help with bugged functions and basic strategy more than once, I'm still proud of the work I've done up to this point.
+
+But speaking in generalities only gets you so far, so I suppose now is a good opportunity to start discussing the learning objectives. 
 
 
-
-```{r cars}
-summary(cars)
-```
 
 ## Including Plots
 
