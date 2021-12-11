@@ -1,0 +1,26 @@
+---
+title: "Final Reflection"
+author: "David Mosack"
+date: "12/8/2021"
+output: pdf_document
+---
+
+## Final Project Link
+https://damosack.shinyapps.io/BechdelMovies/?_ga=2.142585394.1024157967.1639000711-2034314723.1639000711
+## GitHub Repository Link
+
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
