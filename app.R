@@ -1,9 +1,10 @@
+#loading packages
 library(shiny)
 library(tidyverse)
 library(ggExtra)
 library(here)
 
-
+#reading in dataset
 MovieData <- read_csv(here::here("MovieData.csv"))
 
 # Define UI for application that draws a histogram
@@ -12,7 +13,8 @@ ui <- fluidPage(
     # Application title
     titlePanel("Bechdel Test Movie Data"),
 
-    # Sidebar with a slider input for number of bins 
+    # row with first plot and inputs for x-axis
+    # y-axis, and color, where color can be any categorical
    fluidRow(
        column(6, plotOutput("Plot")),
        column(6, style='padding-bottom:0px;', selectInput("y",
@@ -53,7 +55,10 @@ ui <- fluidPage(
               )
         )),
 
-        # Show plot and datatable
+        # bottom row for possible histogram (categorical x)
+        # and dataset. style= ' ' here allows me to adjust the plots in the left
+        # column to line up vertically as close as possible, and bumps to top of
+        # the dataset a bit higher. 
    
         fluidRow( column(6, style='padding-left:28px;',
                          plotOutput("histx", width = "85%")),
@@ -67,13 +72,19 @@ ui <- fluidPage(
 
 server <- function(input, output) {
 
+    #deciding what plots to show based on whether x is categorical
+    #ggExtra::ggMarginal allows inclusion of marginal distribution plots.
+
     output$Plot <- renderPlot({
         if(input$x %in% c("bechdel_pass", "primary_genre", "language")) {
             ggMarginal((
                 ggplot(data= MovieData, 
                    aes_string(x= input$x, y= input$y, color= input$z)) +
                 geom_boxplot() +
+                    #adding invisible scatter points allows the marginal y distribution.
                     geom_point(alpha=0) +
+                    #theme rotates axis labels and changes their distance from axis
+                    #also changed placement and orientation of legend for color
                     theme(axis.text.x = element_text(angle=45, hjust=1), legend.position = "bottom", legend.box = "horizontal")
                 ),
                 type="histogram",
@@ -96,6 +107,7 @@ server <- function(input, output) {
                 theme(axis.text.x = element_text(angle=45, hjust=1))
         }
     })
+    # dataset showing columns for title, ID, & variables selected by user
        output$moviesTable <- DT::renderDataTable({
            DT::datatable(data=select(MovieData, "title", "TMDB_ID", "bechdel_pass", input$x, input$y),
                              options = list(pageLength= 10),

@@ -17,14 +17,19 @@ bechdelmovies <- bmpage %>%
  html_text()
 
 
-#grabbing ratings and assigning to object
-#if movie == pass, rating == 1, else rating == 0;
+#grabbing ratings and assigning to object.
+#code detects string "nopass" since "pass" is contained
+#in all entries.
+#logical check means not passing is a 1. Counterintuitive.
 
 bechdelratings <- bmpage %>%
  html_elements(".movie a:nth-child(1) img") %>%
  html_attr("src") %>%
  str_detect(., "nopass") %>% 
  as.numeric()
+
+#flipping 1 and 0 for bechdelpass to make better sense.
+#if movie == pass, rating == 1, else rating == 0;
 
 bechdelratings <- ifelse(bechdelratings == 0, 1, 0)
 
@@ -40,7 +45,7 @@ api_key <- "cb02ca4d50e794825db1b7e261b553dd"
 
 #creating a function to perform the same as TMDB::search_movie(), 
 #but to return NA if an error is encountered or if no results from search
-
+#pb gives progress bar and time. Works poorly on short operations.
 pb <- progress_estimated(length(MoviesTibble$Movies))
 search_movie_function <- function(api_key, query, page) {
   pb$tick()$print()
@@ -85,26 +90,28 @@ FullTibble <- (bind_rows(list(BMovieTitle = bechdelmovies,
  filter(BMovieTitle == TMDBtitle)
 
 #writing FullTibble to CSV file to save myself from
-#needing to repeat the function
+#needing to repeat iterating the function. Takes time.
 
 write_csv(FullTibble, "Full.csv")
 
+#noticed that while testing my function below that even with a try-error catch
+#entry FullTibble[1964, ] broke the function. Turns out this is a show
+#not a movie so I removed point from data. Unclear why try-catch failed.
+#probably movie() won't pull up any shows even if searched by ID.
 
 FullTibble <- (read_csv("Full.csv"))
 FullTibble[1964, ]
 ModTibble <- FullTibble[-c(1964), ]
 
-#noticed that while testing my function below that even with a try-error catch
-#entry FullTibble[1964, ] broke the function. Turns out this is a show
-#not a movie so I removed point from data. Unclear why try-catch failed
-
-allmovieinfo100base <- map(FullTibble$TMDBID[1], ~movie(api_key, id= . ))
+#Trying base function on first 100 entries.
+allmovieinfo100base <- map(FullTibble$TMDBID[1:100], ~movie(api_key, id= . ))
 
 
 #writing a modified movie function that gives progress, 
 #and selects relevant variables, but otherwise performs similarly to movie()
 #also making it so that if genres or runtime are empty vectors the function 
-#returns NA values instead of breaking and halting progress
+#returns NA values instead of breaking and halting progress.
+#I think breaks because you can't query an empty list.
 
 pg <- progress_bar$new(
   format = " downloading [:bar] :percent eta: :eta",
@@ -150,14 +157,19 @@ pg <- progress_bar$new(
 allmovieinfo100 <- map_df(ModTibble$TMDBID[1964],
                          ~movie_att_function(api_key, id=.))
 
+#using function for full list of movies
+
 ami <- map_df(ModTibble$TMDBID, 
                       ~movie_att_function(api_key, id= . ))
+
+#changing column names to be tidy.
 
 names(ModTibble) <- str_replace_all(names(ModTibble), " ", "_")
 names(ModTibble) <- str_replace(names(ModTibble), "\\(", "_")
 names(ModTibble) <- str_replace(names(ModTibble), "\\)", "_")
 names(ModTibble) <- str_replace(names(ModTibble), "=", "")
 
+#making the basic dataset I'll start with for making my shiny app.
 
 MovieData1 <- (bind_rows(list(title = ModTibble$BMovieTitle, 
                           BT_score.1_is_Pass = ModTibble$Pass__0__Fail_, 
@@ -171,10 +183,27 @@ MovieData1 <- (bind_rows(list(title = ModTibble$BMovieTitle,
                            votes = ami$Votes,
                            primary_genre = ami$Primary_Genre,
                            TMDB_ID = ModTibble$TMDBID)))
- 
+
+#writing this dataset to a csv file to prevent needing to repeat
+#any previous steps. Saves time running iterations.
+
 write_csv(MovieData1, "MovieData1.csv")
 
+#reading the basic dataset back into environment to modify
+#before using in shiny app.
+
 MovieData1 <- read_csv("MovieData1.csv")
+
+#cleaning dataset for use in shiny app.
+#don't need docs or recorded concerts
+#taking out entries without revenue and budget data
+#making bechdel_pass easy to read and treat as categorical
+#making language a simple binary categorical and
+#adding another variable for original language data
+#making release date just release year
+#changing science fiction in primary genre to a shorter name
+#adding log budget and revenue for consideration of transformation
+#selecting relevant columns for investigation in app.
 
 MovieData <- MovieData1 %>%
     filter(primary_genre != "Documentary" & primary_genre != "Music") %>% 
@@ -191,6 +220,9 @@ MovieData <- MovieData1 %>%
            "popularity", "year", "language",
            "runtime","TMDB_rating", "votes",
            "spoken_language", "logbudget", "logrevenue")
+
+#wrting MovieData to csv file for simple implementation in shiny app
+
 write_csv(MovieData, "MovieData.csv")
 
 
